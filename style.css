@@ -1,0 +1,114 @@
+body {
+  background-color: #0a0a0a; /* Changed to dark to support white text */
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Grain Texture Overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.4%22/%3E%3C/svg%3E");
+  opacity: 0.05;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Slightly thinner for mobile elegance */
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  border: 2px solid #0a0a0a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Custom Cursor - Hidden on Touch Devices via Media Query Logic in JS/CSS classes */
+.cursor-ball {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  mix-blend-mode: exclusion;
+  transition: opacity 0.3s ease;
+}
+
+.cursor-inner {
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.cursor-outer {
+  width: 40px;
+  height: 40px;
+  border: 1px solid white;
+  border-radius: 50%;
+  transition: transform 0.2s ease-out;
+}
+
+/* 3D Preloader */
+@keyframes float-boat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+}
+
+/* Horizontal Scroll Section Styles */
+.horizontal-container {
+  width: 300%;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+/* Spline Background */
+.spline-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  /* Adjusted mask to blend deeper down the page */
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  pointer-events: none; /* Ensure it doesn't steal clicks */
+}
+
+/* Crop to hide Watermark */
+.spline-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  /* Clip the bottom 80px of the iframe to hide the logo */
+  clip-path: inset(0 0 80px 0);
+  -webkit-clip-path: inset(0 0 80px 0);
+}
+
+/* Nav Glass Effect */
+.nav-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Modal Styles */
+#modal-content {
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
