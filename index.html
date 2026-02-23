@@ -1,366 +1,614 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="omjdWBXMTo3p37tHKh1xGkbXjW3pKB9WaRO8F_9L9m4" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="google-site-verification"
+      content="omjdWBXMTo3p37tHKh1xGkbXjW3pKB9WaRO8F_9L9m4"
+    />
     <title>Digital Voyage | Mayank Patoliya</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400;1,600&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400;1,600&family=Manrope:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <!-- Tailwind Configuration -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Manrope', 'sans-serif'],
-                        serif: ['Cormorant Garamond', 'serif'],
-                    },
-                    colors: {
-                        'paper-white': '#fdfbf7',
-                        'ink-black': '#0a0a0a', /* Darker for background */
-                        'deep-sea': '#0f172a',
-                        'accent-blue': '#38bdf8',
-                        'glass': 'rgba(255, 255, 255, 0.05)',
-                    },
-                    backgroundImage: {
-                        'grain': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Manrope", "sans-serif"],
+              serif: ["Cormorant Garamond", "serif"],
+            },
+            colors: {
+              "paper-white": "#fdfbf7",
+              "ink-black": "#0a0a0a",
+              "accent-blue": "#38bdf8",
+            },
+          },
+        },
+      };
     </script>
 
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="cursor-none">
-
-    <!-- Noise Texture -->
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-[#0a0a0a]">
     <div class="noise-overlay"></div>
 
-    <!-- Custom Cursor -->
+    <!-- Custom Cursor (Desktop Only) -->
     <div class="cursor-ball cursor-inner hidden md:block opacity-0"></div>
     <div class="cursor-ball cursor-outer hidden md:block opacity-0"></div>
 
-    <!-- 3D Preloader -->
-    <div id="preloader" class="fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center">
-        <div class="relative w-32 h-32 mb-8" style="animation: float-boat 3s infinite ease-in-out;">
-             <!-- CSS Origami Boat -->
-             <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-2xl">
-                 <path d="M10,60 L90,60 L50,90 Z" fill="#334155" /> <!-- Hull (Darker) -->
-                 <path d="M50,55 L50,10 L10,60 Z" fill="#475569" /> <!-- Left Sail -->
-                 <path d="M50,55 L90,60 L50,20 Z" fill="#64748b" /> <!-- Right Sail -->
-             </svg>
+    <!-- Preloader -->
+    <div
+      id="preloader"
+      class="fixed inset-0 z-[60] bg-[#0a0a0a] flex flex-col items-center justify-center"
+    >
+      <div class="relative w-24 h-24 mb-8 boat-float">
+        <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-2xl">
+          <path d="M10,60 L50,55 L90,60 L50,90 Z" fill="#334155" />
+          <path d="M50,55 L50,10 L10,60 Z" fill="#475569" />
+          <path d="M50,55 L90,60 L50,20 Z" fill="#64748b" />
+        </svg>
+      </div>
+      <div class="overflow-hidden h-8 mb-4 text-center">
+        <div
+          id="loader-text"
+          class="text-white font-serif italic text-lg md:text-xl translate-y-full"
+        >
+          Unfolding Reality
         </div>
-        <div class="overflow-hidden h-8 mb-4">
-            <div id="loader-text" class="text-white font-serif italic text-xl translate-y-full">Unfolding Reality</div>
-        </div>
-        <div class="w-64 h-[1px] bg-gray-800 relative overflow-hidden">
-            <div id="loader-progress" class="absolute top-0 left-0 h-full bg-white w-0"></div>
-        </div>
+      </div>
+      <div class="w-48 md:w-64 h-[1px] bg-gray-800 relative overflow-hidden">
+        <div
+          id="loader-progress"
+          class="absolute top-0 left-0 h-full bg-accent-blue w-0"
+        ></div>
+      </div>
     </div>
 
-    <!-- Spline Background (Fixed) -->
+    <!-- Spline Background -->
     <div class="spline-wrapper opacity-0" id="spline-bg">
-        <iframe src='https://my.spline.design/animatedpaperboat-5V0hd9xLxuI9sJcGAjxOXyHS/?ui=false&watermark=false' frameborder='0' width='100%' height='100%'></iframe>
+      <iframe
+        src="https://my.spline.design/animatedpaperboat-5V0hd9xLxuI9sJcGAjxOXyHS/?ui=false&watermark=false"
+        frameborder="0"
+      ></iframe>
     </div>
 
-    <!-- Fixed Logo (Top Left) -->
-    <header class="fixed top-0 left-0 w-full p-6 md:p-8 z-40 flex justify-between items-start pointer-events-none">
-        <a href="#" class="pointer-events-auto group">
-            <div class="font-serif text-2xl md:text-3xl font-bold tracking-tighter text-white leading-none">
-              <span class="italic text-gray-400 group-hover:text-accent-blue transition-colors">M</span>ayank<span class="italic text-gray-400 group-hover:text-accent-blue transition-colors">P</span>atoliya.
-            </div>
-            <div class="text-[8px] md:text-[10px] uppercase tracking-[0.3em] mt-1 font-sans text-gray-400">Web designer & developer</div>
-        </a>
-        
-        <div class="text-right hidden md:block">
-            <p class="text-xs uppercase tracking-widest text-gray-400">Available for 2025</p>
-            <p id="clock" class="text-xs font-mono text-white mt-1">00:00:00</p>
+    <!-- Header -->
+    <header
+      class="fixed top-0 left-0 w-full p-6 md:p-10 z-40 flex justify-between items-start pointer-events-none"
+    >
+      <a href="#" class="pointer-events-auto group">
+        <div
+          class="header-text font-serif text-xl md:text-3xl font-bold tracking-tighter text-white leading-none"
+        >
+          <span
+            class="italic text-gray-400 group-hover:text-accent-blue transition-colors"
+            >M</span
+          >ayank<span
+            class="italic text-gray-400 group-hover:text-accent-blue transition-colors"
+            >P</span
+          >atoliya.
         </div>
+        <div
+          class="header-sub text-[8px] md:text-[10px] uppercase tracking-[0.3em] mt-1 font-sans text-gray-400"
+        >
+          Web designer & developer
+        </div>
+      </a>
+
+      <div class="text-right hidden sm:block">
+        <p
+          class="header-sub text-[10px] uppercase tracking-widest text-gray-500"
+        >
+          Local Time
+        </p>
+        <p id="clock" class="text-xs font-mono text-white mt-1">00:00:00</p>
+      </div>
     </header>
 
-    <!-- Floating Navigation (Bottom Center) -->
-    <nav class="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-40 nav-glass rounded-full px-4 md:px-6 py-3 shadow-2xl hover:shadow-accent-blue/20 transition-all duration-300 transform hover:-translate-y-1 w-[90%] md:w-auto max-w-sm md:max-w-none flex justify-center">
-        <ul class="flex space-x-4 md:space-x-8 text-xs md:text-sm font-sans font-medium text-white whitespace-nowrap">
-            <li><a href="#hero" class="nav-item hover:text-accent-blue transition-colors relative">Home</a></li>
-            <li><a href="#about" class="nav-item hover:text-accent-blue transition-colors relative">Philosophy</a></li>
-            <li><a href="#studio" class="nav-item hover:text-accent-blue transition-colors relative">Shipyard</a></li>
-            <li><a href="#work" class="nav-item hover:text-accent-blue transition-colors relative">Voyages</a></li>
-            <li><a href="#contact" class="nav-item hover:text-accent-blue transition-colors relative">Contact</a></li>
-        </ul>
+    <!-- Navigation -->
+    <nav
+      id="floating-nav"
+      class="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 nav-glass rounded-full px-4 md:px-8 py-3 shadow-2xl w-[92%] max-w-lg md:w-auto"
+    >
+      <ul
+        class="flex justify-between md:space-x-10 text-[10px] md:text-xs font-sans font-semibold text-white uppercase tracking-widest"
+      >
+        <li>
+          <a
+            href="#hero"
+            class="nav-item hover:!text-accent-blue py-1 transition-colors"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="#about"
+            class="nav-item hover:!text-accent-blue py-1 transition-colors"
+            >About</a
+          >
+        </li>
+        <li>
+          <a
+            href="#work"
+            class="nav-item hover:!text-accent-blue py-1 transition-colors"
+            >Work</a
+          >
+        </li>
+        <li>
+          <a
+            href="#contact"
+            class="nav-item hover:!text-accent-blue py-1 transition-colors"
+            >Contact</a
+          >
+        </li>
+      </ul>
     </nav>
 
-    <!-- Main Content -->
     <main>
+      <!-- HERO SECTION -->
+      <section
+        id="hero"
+        class="relative h-screen w-full flex items-center px-6 md:px-20 overflow-hidden"
+      >
+        <div class="relative z-10 w-full max-w-7xl mx-auto">
+          <div class="overflow-hidden">
+            <h1
+              class="hero-line py-2 md:py-6 text-[16vw] md:text-[11vw] leading-none font-serif font-light text-white translate-y-full"
+            >
+              Digital
+            </h1>
+          </div>
+          <div class="overflow-hidden flex items-center gap-4">
+            <div
+              class="hidden md:block w-24 h-[1px] bg-white/30 hero-line translate-y-[100px]"
+            ></div>
+            <h1
+              class="hero-line py-2 md:py-6 text-[16vw] md:text-[11vw] leading-none font-serif italic text-gray-300 translate-y-full"
+            >
+              Origami
+            </h1>
+          </div>
 
-        <!-- SECTION 1: HERO -->
-        <section id="hero" class="relative h-screen w-full flex items-center px-6 md:px-20 overflow-hidden">
-            <div class="relative z-10 w-full max-w-7xl mx-auto">
-                <div class="overflow-hidden pb-4">
-                    <h1 class="hero-line text-[14vw] md:text-[12vw] leading-none font-serif font-light text-white translate-y-full drop-shadow-lg">
-                        Digital
-                    </h1>
-                </div>
-                <div class="overflow-hidden flex items-center gap-2 md:gap-4 pb-4">
-                    <div class="w-12 md:w-20 h-[1px] bg-white hidden md:block hero-line translate-y-full"></div>
-                    <h1 class="hero-line text-[14vw] md:text-[12vw] leading-none font-serif italic text-gray-200 translate-y-full drop-shadow-lg">
-                        Origami
-                    </h1>
-                </div>
-                
-                <div class="mt-8 md:mt-12 max-w-md ml-auto md:mr-20">
-                    <p class="hero-text text-base md:text-lg font-sans text-gray-300 leading-relaxed opacity-0 translate-y-4 shadow-black drop-shadow-md">
-                        We fold code and design into immersive web experiences. 
-                        Navigating the intersection of art and engineering.
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Scroll Prompt -->
-            <div class="absolute bottom-28 md:bottom-32 left-6 md:left-20 flex flex-col items-center gap-2 opacity-0 hero-text">
-                <div class="w-[1px] h-8 md:h-12 bg-gray-600">
-                    <div class="w-full h-1/2 bg-white animate-pulse"></div>
-                </div>
-                <span class="text-[8px] md:text-[10px] uppercase tracking-widest writing-vertical-lr text-white rotate-180">Scroll</span>
-            </div>
-        </section>
-
-        <!-- SECTION 2: PHILOSOPHY -->
-        <section id="about" class="py-24 md:py-32 px-6 md:px-20 relative min-h-screen flex items-center justify-center">
-            <div class="max-w-4xl mx-auto text-center relative z-10">
-                <div class="text-xs md:text-sm font-sans uppercase tracking-[0.3em] text-accent-blue mb-6 fade-in">The Philosophy</div>
-                
-                <h2 class="text-3xl md:text-6xl font-serif leading-tight text-white mb-10 fade-in drop-shadow-xl">
-                    Just as a paper boat relies on precise folds to float, <br>
-                    <span class="italic text-gray-300">great digital experiences</span> rely on structure.
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mt-16 md:mt-20 fade-in">
-                    <div class="border-t border-gray-700 pt-6">
-                        <span class="text-xs font-mono text-accent-blue mb-2 block">01</span>
-                        <h3 class="text-lg font-bold mb-2 text-white">Fluidity</h3>
-                        <p class="text-sm text-gray-400">Interfaces that flow like water, responding naturally to every interaction.</p>
-                    </div>
-                    <div class="border-t border-gray-700 pt-6">
-                        <span class="text-xs font-mono text-accent-blue mb-2 block">02</span>
-                        <h3 class="text-lg font-bold mb-2 text-white">Precision</h3>
-                        <p class="text-sm text-gray-400">Clean code architecture. Every pixel and folding line calculated.</p>
-                    </div>
-                    <div class="border-t border-gray-700 pt-6">
-                        <span class="text-xs font-mono text-accent-blue mb-2 block">03</span>
-                        <h3 class="text-lg font-bold mb-2 text-white">Depth</h3>
-                        <p class="text-sm text-gray-400">Creating dimension in a flat screen using light, shadow, and motion.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 2.5: THE SHIPYARD -->
-        <section id="studio" class="py-24 md:py-32 px-6 md:px-20 relative min-h-screen flex items-center z-20">
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
-                <div class="relative">
-                    <div class="text-xs md:text-sm font-sans uppercase tracking-[0.3em] text-accent-blue mb-6 fade-in">The Shipyard</div>
-                    <h2 class="text-3xl md:text-6xl font-serif leading-tight text-white mb-8 fade-in">
-                        Crafting vessels for <br>
-                        <span class="italic text-gray-400">digital exploration.</span>
-                    </h2>
-                    <p class="text-gray-300 text-base md:text-lg leading-relaxed max-w-md fade-in">
-                        Hi, I’m Mayank Patoliya — a B.Tech AI student who enjoys learning and building things with code.
-I’m comfortable working with machine learning techniques and web technologies, and I like creating clean, responsive, and functional digital experiences.
-                    </p>
-                    <div class="mt-8 fade-in">
-    <a href="./Mayank-patoliya-resume.pdf" download class="group inline-flex items-center gap-3 px-5 py-3 rounded-full border border-gray-700 hover:border-accent-blue bg-white/5 hover:bg-white/10 transition-all duration-300">
-        <span class="text-xs font-sans uppercase tracking-widest text-gray-300 group-hover:text-accent-blue transition-colors">Download Resume</span>
-        <svg class="w-4 h-4 text-gray-500 group-hover:text-accent-blue transition-colors transform group-hover:translate-y-0.5 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-    </a>
-</div>
-                    
-                    <div class="mt-8 md:mt-12 flex flex-wrap gap-3 md:gap-4 fade-in">
-                        <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">HTML5</span>
-                        <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">CSS3</span>
-                        <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">JavaScript</span>
-                        <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">React</span>
-                         <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">Spline</span>
-                          <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">Tailwiind CSS</span>
-                           <span class="px-3 py-1 md:px-4 md:py-2 border border-gray-700 rounded-full text-[10px] md:text-xs uppercase tracking-widest text-gray-400 hover:border-accent-blue transition-colors cursor-default">GSAP</span>
-                    </div>
-                </div>
-
-                <div class="relative h-64 md:h-full flex items-center justify-center fade-in mt-8 md:mt-0">
-                     <div class="relative w-full max-w-[300px] md:max-w-md aspect-square border border-white/10 rounded-full flex items-center justify-center p-8 animate-[spin_60s_linear_infinite]">
-                        <div class="absolute inset-0 border border-white/5 rounded-full scale-75"></div>
-                        <div class="absolute inset-0 border border-white/5 rounded-full scale-50"></div>
-                        <div class="w-full h-[1px] bg-white/10 absolute top-1/2 left-0 -translate-y-1/2"></div>
-                        <div class="h-full w-[1px] bg-white/10 absolute top-0 left-1/2 -translate-x-1/2"></div>
-                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: HORIZONTAL WORKS (The "Voyage") -->
-        <section id="work" class="relative min-h-screen text-white overflow-hidden z-20">
-            <div class="horizontal-scroll-wrapper w-full h-full flex flex-col md:flex-row items-center">
-                
-                <!-- Intro Panel -->
-                <div class="panel w-full md:w-screen h-[50vh] md:h-full flex-shrink-0 flex flex-col justify-center px-6 md:px-20 relative border-r border-white/10 border-b md:border-b-0">
-                    <div class="absolute top-10 md:top-20 left-6 md:left-20 text-[15vw] md:text-[10vw] font-serif opacity-10 leading-none select-none text-white">2025</div>
-                    <h2 class="text-4xl md:text-6xl lg:text-8xl font-serif z-10 text-white mt-10 md:mt-0">Selected <br><span class="italic text-gray-500">Voyages</span></h2>
-                    <p class="mt-4 md:mt-8 text-gray-400 max-w-sm text-sm md:text-base">Drag or scroll to navigate through my expeditions.</p>
-                    <div class="mt-8 md:mt-12 flex items-center gap-4">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white transform rotate-90 md:rotate-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 1 -->
-                <div class="panel w-full md:w-screen min-h-screen md:h-full flex-shrink-0 flex items-center justify-center relative border-r border-white/10 group py-20 md:py-0 border-b md:border-b-0">
-                    <div class="relative w-[90vw] h-[50vh] md:w-[40vw] md:h-[60vh] overflow-hidden bg-gray-900">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100" style="background-image: url('./image/freatboard.png');"></div>
-                        <div class="absolute bottom-0 left-0 p-6 md:p-8 w-full bg-gradient-to-t from-black via-black/50 to-transparent">
-                            <div class="text-[10px] md:text-xs font-mono text-accent-blue mb-2">Music learning tool</div>
-                            <h3 class="text-2xl md:text-4xl font-serif text-white mb-2">FretBoard Memorier</h3>
-                            <a href="javascript:void(0)" onclick="openProject(0)" class="inline-block text-xs md:text-sm border-b border-white/30 hover:border-white pb-1 transition-colors text-white cursor-pointer z-20 relative">View Case Study</a>
-                        </div>
-                    </div>
-                    <div class="absolute top-4 right-6 md:top-10 md:right-10 text-[8rem] md:text-[15rem] font-serif text-white/5 pointer-events-none">01</div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="panel w-full md:w-screen min-h-screen md:h-full flex-shrink-0 flex items-center justify-center relative border-r border-white/10 group py-20 md:py-0 border-b md:border-b-0">
-                    <div class="relative w-[90vw] h-[50vh] md:w-[40vw] md:h-[60vh] overflow-hidden bg-gray-900">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100" style="background-image: url('image/cyberbullying.png');"></div>
-                        <div class="absolute bottom-0 left-0 p-6 md:p-8 w-full bg-gradient-to-t from-black via-black/50 to-transparent">
-                            <div class="text-[10px] md:text-xs font-mono text-accent-blue mb-2">AI tool</div>
-                            <h3 class="text-2xl md:text-4xl font-serif text-white mb-2">AI-Powered Cyberbullying Detection System</h3>
-                            <a href="javascript:void(0)" onclick="openProject(1)" class="inline-block text-xs md:text-sm border-b border-white/30 hover:border-white pb-1 transition-colors text-white cursor-pointer z-20 relative">View Case Study</a>
-                        </div>
-                    </div>
-                    <div class="absolute top-4 right-6 md:top-10 md:right-10 text-[8rem] md:text-[15rem] font-serif text-white/5 pointer-events-none">02</div>
-                </div>
-
-                 
-
-            </div>
-        </section>
-
-        <!-- SECTION 4: CONTACT -->
-        <section id="contact" class="h-screen flex items-center justify-center px-6 bg-paper-white relative">
-            <div class="max-w-5xl w-full text-center z-10">
-                <p class="text-xs md:text-sm font-sans uppercase tracking-[0.3em] text-gray-500 mb-6 md:mb-8">Drop Anchor</p>
-                <a href="mailto:mayankpatoliya20@gmail.com" class="group relative inline-block">
-                    <h2 class="text-[10vw] md:text-[6vw] font-serif text-ink-black leading-none group-hover:italic transition-all duration-300">
-                        mayankpatoliya20@gmail.com
-                    </h2>
-                    <div class="absolute bottom-2 md:bottom-9 left-0 w-full h-[2px] bg-accent-blue scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                </a>
-                <div class="mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-left max-w-2xl mx-auto">
-                    <div>
-                        <h4 class="font-bold text-sm mb-4 text-black">Socials</h4>
-                        <ul class="space-y-2 text-xs md:text-sm text-gray-500">
-                            <li><a href="https://www.instagram.com/mayank._.patoliya/" class="hover:text-ink-black transition-colors">Instagram</a></li>
-                            <li><a href="https://www.linkedin.com/in/mayank-patoliya-875712376?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="hover:text-ink-black transition-colors">LinkedIn</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm mb-4 text-black">Location</h4>
-                        <p class="text-xs md:text-sm text-gray-500">Chattisgarh, Raipur,<br>India</p>
-                    </div>
-                     <div>
-                        <h4 class="font-bold text-sm mb-4 text-black">Time</h4>
-                        <p class="text-xs md:text-sm text-gray-500">IST (UTC+5:30)<br>Remote Friendly</p>
-                    </div>
-                     <div>
-                        <h4 class="font-bold text-sm mb-4 text-black">Legal</h4>
-                        <p class="text-xs md:text-sm text-gray-500">© 2025 Mayank Patoliya.<br>Privacy Policy</p>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute bottom-0 w-full h-32 bg-gradient-to-t from-gray-200 to-transparent z-0"></div>
-        </section>
-        
-        <!-- PROJECT MODAL -->
-        <div id="project-modal" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none">
-            <!-- Backdrop -->
-            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modal-bg" onclick="closeProject()"></div>
-            
-            <!-- Modal Card -->
-            <div class="relative w-full md:max-w-6xl h-full md:h-[80vh] bg-[#0a0a0a] border border-white/10 flex flex-col md:flex-row overflow-hidden shadow-2xl transform translate-y-20 mx-0 md:mx-4" id="modal-content">
-                
-                <!-- Close Button -->
-                <button onclick="closeProject()" class="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 rounded-full bg-black/50 hover:bg-white/20 text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-
-                <!-- Left: Image Area (Top on Mobile) -->
-                <div class="w-full md:w-1/2 h-[40vh] md:h-full relative overflow-hidden bg-gray-900 shrink-0">
-                    <img id="modal-img" src="image/freatboard.png" alt="Project Image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:bg-gradient-to-r"></div>
-                </div>
-
-                <!-- Right: Content Area (Bottom on Mobile) -->
-                <div class="w-full md:w-1/2 h-auto md:h-full p-6 md:p-16 flex flex-col justify-center relative overflow-y-auto">
-                    <div class="space-y-4 md:space-y-6 pb-10 md:pb-0">
-                        <div class="flex items-center gap-4 text-xs md:text-sm text-accent-blue font-mono uppercase tracking-widest">
-                            <span id="modal-year">2025</span>
-                            <span class="w-1 h-1 rounded-full bg-gray-500"></span>
-                            <span id="modal-category">Web Development</span>
-                        </div>
-                        
-                        <h2 id="modal-title" class="text-3xl md:text-5xl font-serif text-white leading-tight">Project Title</h2>
-                        
-                        <div class="w-20 h-[1px] bg-white/20 my-4"></div>
-                        
-                        <p id="modal-desc" class="text-gray-400 text-sm md:text-lg leading-relaxed">
-                            Project description goes here.
-                        </p>
-
-                        <div class="pt-6 md:pt-8">
-                             <a href="#" class="inline-flex items-center gap-2 text-white border-b border-white hover:border-accent-blue hover:text-accent-blue transition-colors pb-1 group text-sm md:text-base">
-                                <!-- Launch Live Site -->
-                                <!-- <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg> -->
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Decorative element in modal -->
-                    <div class="absolute bottom-4 right-4 md:bottom-8 md:right-8 opacity-10 pointer-events-none">
-                        <svg width="60" height="60" md:width="100" md:height="100" viewBox="0 0 100 100" class="text-white fill-current">
-                            <path d="M10,60 L90,60 L50,90 Z" />
-                            <path d="M50,55 L50,10 L10,60 Z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+          <div class="mt-8 md:mt-12 max-w-sm ml-auto md:mr-32">
+            <p
+              class="hero-text text-sm md:text-lg font-sans text-gray-400 leading-relaxed opacity-0 translate-y-8"
+            >
+              Folding code and design into immersive digital voyages. Navigating
+              the intersection of art and AI engineering.
+            </p>
+          </div>
         </div>
 
-    <!-- Linked Script File -->
-    <script src="script.js"></script>
-</body>
+        <div
+          class="absolute bottom-28 md:bottom-12 left-6 md:left-20 flex flex-col items-center gap-3 opacity-0 hero-text"
+        >
+          <div
+            class="w-[1px] h-10 bg-gradient-to-b from-accent-blue to-transparent animate-bounce"
+          ></div>
+          <span
+            class="text-[9px] uppercase tracking-[0.4em] text-white/50 [writing-mode:vertical-lr] rotate-180"
+            >Scroll</span
+          >
+        </div>
+      </section>
 
+      <!-- ABOUT SECTION -->
+      <section
+        id="about"
+        class="py-24 md:py-40 px-6 md:px-20 relative bg-zinc-950/50"
+      >
+        <div class="max-w-5xl mx-auto">
+          <div
+            class="text-[10px] md:text-xs font-mono uppercase tracking-[0.4em] text-accent-blue mb-8 reveal"
+          >
+            The Shipyard
+          </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-end"
+          >
+            <div>
+              <h2
+                class="text-3xl md:text-6xl font-serif leading-tight text-white mb-8 reveal"
+              >
+                Precise folds, <br />
+                <span class="italic text-gray-400">fluid movement.</span>
+              </h2>
+              <p
+                class="text-gray-400 text-sm md:text-lg leading-relaxed reveal"
+              >
+                I am Mayank Patoliya — a B.Tech AI student based in India. I
+                specialize in building responsive web systems and implementing
+                machine learning pipelines that solve real-world problems.
+              </p>
+              <div
+                class="mt-10 flex flex-col md:flex-row gap-6 md:gap-4 items-start md:items-center reveal"
+              >
+                <a
+                  href="Mayank-patoliya-resume.pdf"
+                  download="Mayank_Patoliya_Resume.pdf"
+                  class="px-6 py-3 rounded-full border border-white/10 hover:border-accent-blue text-[10px] uppercase tracking-widest text-white transition-all shrink-0"
+                  >Resume</a
+                >
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >HTML</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >CSS</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >JavaScript</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >Tailwind</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >Bootstrap</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >Three.js</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >Spline</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >GSAP</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >PHP</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >AI</span
+                  >
+                  <span
+                    class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-white/30 transition-colors"
+                    >NLP</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-8 reveal">
+              <div class="group border-b border-white/5 pb-6">
+                <span class="text-[10px] text-accent-blue mb-2 block font-mono"
+                  >01/02</span
+                >
+                <h3
+                  class="text-xl text-white group-hover:italic transition-all"
+                >
+                  Fluid Architecture
+                </h3>
+                <p class="text-xs text-gray-500 mt-2">
+                  Developing interfaces that adapt flawlessly to any viewport
+                  size.
+                </p>
+              </div>
+              <div class="group border-b border-white/5 pb-6">
+                <span class="text-[10px] text-accent-blue mb-2 block font-mono"
+                  >02/02</span
+                >
+                <h3
+                  class="text-xl text-white group-hover:italic transition-all"
+                >
+                  AI Integration
+                </h3>
+                <p class="text-xs text-gray-500 mt-2">
+                  Applying deep learning and NLP to create smart user
+                  experiences.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKS SECTION -->
+      <section
+        id="work"
+        class="relative min-h-screen md:h-screen text-white overflow-x-clip md:overflow-hidden z-20 flex flex-col md:block"
+      >
+        <div
+          id="horizontal-scroll"
+          class="flex flex-col md:flex-row h-auto md:h-full"
+        >
+          <div
+            class="panel w-full md:w-screen flex-shrink-0 flex flex-col justify-center px-6 md:px-24 relative border-r border-white/5"
+          >
+            <div
+              class="absolute top-10 md:top-1/4 left-6 md:left-24 text-[20vw] font-serif opacity-5 leading-none select-none"
+            >
+              WORKS
+            </div>
+            <h2 class="text-5xl md:text-8xl font-serif z-10 text-white reveal">
+              Selected <br /><span class="italic text-gray-500">Voyages</span>
+            </h2>
+            <p class="mt-6 text-gray-400 max-w-sm text-sm reveal">
+              A collection of academic and personal expeditions in web and AI.
+            </p>
+          </div>
+
+          <div
+            class="panel w-full md:w-screen flex-shrink-0 flex items-center justify-center relative border-r border-white/5 group px-6 md:px-0"
+          >
+            <div
+              class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200"
+                alt="Fretboard"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+              ></div>
+              <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full">
+                <div
+                  class="text-[10px] font-mono text-accent-blue mb-2 uppercase tracking-widest"
+                >
+                  Educational Tool
+                </div>
+                <h3 class="text-3xl md:text-5xl font-serif text-white mb-4">
+                  FretBoard Memorizer
+                </h3>
+                <button
+                  onclick="openProject(0)"
+                  class="text-xs uppercase tracking-[0.3em] border-b border-white/20 hover:border-accent-blue pb-1 transition-all"
+                >
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="panel w-full md:w-screen flex-shrink-0 flex items-center justify-center relative border-r border-white/5 group px-6 md:px-0"
+          >
+            <div
+              class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200"
+                alt="Cyberbullying"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+              ></div>
+              <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full">
+                <div
+                  class="text-[10px] font-mono text-accent-blue mb-2 uppercase tracking-widest"
+                >
+                  NLP • Machine Learning
+                </div>
+                <h3 class="text-3xl md:text-5xl font-serif text-white mb-4">
+                  AI Cyberbullying Detection System
+                </h3>
+                <button
+                  onclick="openProject(1)"
+                  class="text-xs uppercase tracking-[0.3em] border-b border-white/20 hover:border-accent-blue pb-1 transition-all"
+                >
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="panel w-full md:w-screen flex-shrink-0 flex items-center justify-center relative border-r border-white/5 group px-6 md:px-0"
+          >
+            <div
+              class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
+            >
+              <img
+                src="ai_music_therapy.png"
+                alt="Music Therapy"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+              ></div>
+              <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full">
+                <div
+                  class="text-[10px] font-mono text-accent-blue mb-2 uppercase tracking-widest"
+                >
+                  AI • Audio Processing
+                </div>
+                <h3 class="text-3xl md:text-5xl font-serif text-white mb-4">
+                  AI Music Therapy System
+                </h3>
+                <button
+                  onclick="openProject(2)"
+                  class="text-xs uppercase tracking-[0.3em] border-b border-white/20 hover:border-accent-blue pb-1 transition-all"
+                >
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT SECTION -->
+      <section
+        id="contact"
+        class="min-h-screen flex items-center justify-center px-6 py-20 bg-paper-white text-ink-black relative overflow-hidden"
+      >
+        <div class="max-w-5xl w-full text-center z-10">
+          <p
+            class="text-[10px] md:text-xs font-sans uppercase tracking-[0.5em] text-gray-500 mb-12"
+          >
+            Drop Anchor
+          </p>
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=mayankpatoliya20@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="contact-link group relative inline-block mb-20"
+          >
+            <h2
+              class="text-[8vw] md:text-[5vw] font-serif leading-none group-hover:italic transition-all duration-300"
+            >
+              mayankpatoliya20@gmail.com
+            </h2>
+            <div
+              class="absolute -bottom-1 md:-bottom-2 left-0 w-full h-[1px] bg-ink-black scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"
+            ></div>
+          </a>
+
+          <div
+            class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-left max-w-4xl mx-auto border-t border-black/10 pt-12 md:pt-16"
+          >
+            <div>
+              <h4 class="font-bold text-[10px] uppercase tracking-widest mb-4">
+                Social
+              </h4>
+              <ul class="space-y-2 text-sm text-gray-600">
+                <li>
+                  <a href="#" class="hover:text-black transition-colors"
+                    >LinkedIn</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-black transition-colors"
+                    >GitHub</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-bold text-[10px] uppercase tracking-widest mb-4">
+                Base
+              </h4>
+              <p class="text-sm text-gray-600">
+                Chhattisgarh, Raipur<br />India
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-[10px] uppercase tracking-widest mb-4">
+                Status
+              </h4>
+              <p class="text-sm text-gray-600">
+                Available for<br />Opportunities 2026
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-[10px] uppercase tracking-widest mb-4">
+                Legal
+              </h4>
+              <p class="text-[10px] text-gray-500">
+                © 2025 Mayank Patoliya.<br />All Rights Reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- PROJECT MODAL -->
+    <div
+      id="project-modal"
+      class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none"
+    >
+      <div
+        class="absolute inset-0 bg-black/95 backdrop-blur-md"
+        onclick="closeProject()"
+      ></div>
+
+      <div
+        id="modal-content"
+        class="relative w-[95%] md:w-[90%] max-w-6xl h-[85vh] md:h-[80vh] bg-[#0a0a0a] border border-white/10 flex flex-col md:flex-row overflow-hidden shadow-2xl"
+      >
+        <button
+          onclick="closeProject()"
+          class="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/5 hover:bg-white/20 text-white transition-all"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        <div
+          class="w-full md:w-1/2 h-1/3 md:h-full overflow-hidden bg-zinc-900 shrink-0"
+        >
+          <img
+            id="modal-img"
+            src=""
+            alt=""
+            class="w-full h-full object-cover"
+          />
+        </div>
+
+        <div
+          class="w-full md:w-1/2 h-2/3 md:h-full p-8 md:p-20 flex flex-col justify-center overflow-y-auto"
+        >
+          <div
+            class="text-xs font-mono text-accent-blue mb-4 uppercase tracking-[0.2em]"
+            id="modal-category"
+          >
+            Category
+          </div>
+          <h2
+            id="modal-title"
+            class="text-4xl md:text-6xl font-serif text-white mb-6"
+          >
+            Title
+          </h2>
+          <div class="w-12 h-[1px] bg-accent-blue/50 mb-8"></div>
+          <p
+            id="modal-desc"
+            class="text-gray-400 text-sm md:text-lg leading-relaxed mb-10"
+          >
+            Description
+          </p>
+          <div
+            id="modal-year"
+            class="text-[10px] text-gray-600 font-mono uppercase tracking-widest mt-auto"
+          >
+            Year: 2024
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link to external JS -->
+    <script src="script.js" defer></script>
+  </body>
 </html>
-
-
-
-
