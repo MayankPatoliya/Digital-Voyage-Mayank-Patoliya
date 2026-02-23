@@ -1,100 +1,115 @@
-// --- 1. CONFIG & UTILS ---
 gsap.registerPlugin(ScrollTrigger);
 
+// --- 1. CLOCK UTILITY ---
+// Optimized to only update when values actually change
 const updateClock = () => {
-  const now = new Date();
-  const clockElement = document.getElementById("clock");
-  if (clockElement) {
-    clockElement.innerText = now.toLocaleTimeString("en-US", { hour12: false });
+  const clock = document.getElementById("clock");
+  if (clock) {
+    const now = new Date();
+    clock.innerText = now.toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   }
 };
 setInterval(updateClock, 1000);
 updateClock();
 
-// --- 2. CURSOR LOGIC ---
+// --- 2. REFINED CUSTOM CURSOR ---
+// Using quickSetter for better performance (bypasses GSAP property parser)
 const cursorInner = document.querySelector(".cursor-inner");
 const cursorOuter = document.querySelector(".cursor-outer");
-let mouseX = 0,
-  mouseY = 0;
-let cursorX = 0,
-  cursorY = 0;
 
-window.addEventListener("mousemove", (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+if (cursorInner && cursorOuter) {
+  const xInnerSetter = gsap.quickSetter(cursorInner, "x", "px");
+  const yInnerSetter = gsap.quickSetter(cursorInner, "y", "px");
+  const xOuterSetter = gsap.quickSetter(cursorOuter, "x", "px");
+  const yOuterSetter = gsap.quickSetter(cursorOuter, "y", "px");
 
-  // Inner dot moves instantly
-  if (cursorInner) gsap.set(cursorInner, { x: mouseX - 5, y: mouseY - 5 });
-});
+  let mouseX = 0,
+    mouseY = 0;
+  let cx = 0,
+    cy = 0;
 
-// Smooth follow for outer circle
-gsap.ticker.add(() => {
-  const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
-  cursorX += (mouseX - cursorX) * dt;
-  cursorY += (mouseY - cursorY) * dt;
-  if (cursorOuter) gsap.set(cursorOuter, { x: cursorX - 20, y: cursorY - 20 });
-});
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 
-// Hover Effects for Cursor
-document.querySelectorAll("a, .nav-item, button").forEach((el) => {
-  el.addEventListener("mouseenter", () => {
-    gsap.to(cursorOuter, {
-      scale: 1.5,
-      borderColor: "transparent",
-      backgroundColor: "rgba(255,255,255,0.2)",
-      duration: 0.3,
+    // Instant inner dot
+    xInnerSetter(mouseX - 4);
+    yInnerSetter(mouseY - 4);
+  });
+
+  // Smooth lerp for outer ring
+  gsap.ticker.add(() => {
+    const lerp = 0.15;
+    cx += (mouseX - cx) * lerp;
+    cy += (mouseY - cy) * lerp;
+    xOuterSetter(cx - 18);
+    yOuterSetter(cy - 18);
+  });
+
+  // Interaction states
+  const interactiveElements = document.querySelectorAll(
+    "a, button, .nav-item, .project-card",
+  );
+  interactiveElements.forEach((el) => {
+    el.addEventListener("mouseenter", () => {
+      gsap.to(cursorOuter, {
+        scale: 1.8,
+        backgroundColor: "rgba(255,255,255,0.15)",
+        borderWidth: "0px",
+        duration: 0.3,
+        ease: "power2.out",
+      });
+      gsap.to(cursorInner, { scale: 0.5, duration: 0.3 });
+    });
+    el.addEventListener("mouseleave", () => {
+      gsap.to(cursorOuter, {
+        scale: 1,
+        backgroundColor: "transparent",
+        borderWidth: "1px",
+        duration: 0.3,
+        ease: "power2.out",
+      });
+      gsap.to(cursorInner, { scale: 1, duration: 0.3 });
     });
   });
-  el.addEventListener("mouseleave", () => {
-    gsap.to(cursorOuter, {
-      scale: 1,
-      borderColor: "white",
-      backgroundColor: "transparent",
-      duration: 0.3,
-    });
-  });
-});
+}
 
-// --- 3. PRELOADER ---
-const initSite = () => {
-  const tl = gsap.timeline();
+// --- 3. PRELOADER & INITIAL SEQUENCING ---
+window.addEventListener("load", () => {
+  // Force scroll to top on reload to prevent ScrollTrigger calc errors
+  window.scrollTo(0, 0);
+
+  const tl = gsap.timeline({
+    onComplete: () => ScrollTrigger.refresh(),
+  });
 
   tl.to("#loader-progress", {
     width: "100%",
-    duration: 1.5,
+    duration: 1.2,
     ease: "power2.inOut",
   })
-    .to(
-      "#loader-text",
-      {
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-      },
-      "-=1"
-    )
+    .to("#loader-text", { y: 0, duration: 0.6, ease: "power2.out" })
     .to("#preloader", {
       yPercent: -100,
       duration: 1.2,
-      ease: "power4.inOut",
+      ease: "expo.inOut",
+      delay: 0.2,
     })
-    .to(
-      "#spline-bg",
-      {
-        opacity: 1,
-        duration: 1.5,
-      },
-      "-=0.8"
-    )
+    .to("#spline-bg", { opacity: 1, duration: 2, ease: "none" }, "-=0.8")
     .to(
       ".hero-line",
       {
         y: 0,
         stagger: 0.1,
-        duration: 1.2,
+        duration: 1.4,
         ease: "power4.out",
       },
-      "-=0.5"
+      "-=1.2",
     )
     .to(
       ".hero-text",
@@ -102,188 +117,180 @@ const initSite = () => {
         opacity: 1,
         y: 0,
         duration: 1,
+        stagger: 0.2,
+        ease: "power3.out",
       },
-      "-=0.8"
+      "-=1",
     )
-    // Reveal cursor after preloader
-    .to(
-      ".cursor-ball",
-      {
-        opacity: 1,
-        duration: 0.5,
-      },
-      "-=0.5"
-    );
-};
-
-window.addEventListener("load", () => {
-  setTimeout(initSite, 500);
+    .to(".cursor-ball", { opacity: 1, duration: 0.5 }, "-=0.5");
 });
 
-// --- 4. SCROLL ANIMATIONS ---
-gsap.utils.toArray(".fade-in").forEach((el) => {
-  gsap.fromTo(
-    el,
-    { opacity: 0, y: 30 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      scrollTrigger: {
-        trigger: el,
-        start: "top 80%",
-      },
-    }
-  );
+// --- 4. SCROLL REVEAL ANIMATIONS ---
+gsap.utils.toArray(".reveal").forEach((el) => {
+  gsap.from(el, {
+    opacity: 0,
+    y: 40,
+    duration: 1,
+    ease: "power3.out",
+    scrollTrigger: {
+      trigger: el,
+      start: "top 90%",
+      toggleActions: "play none none reverse",
+    },
+  });
 });
 
-// Responsive Horizontal Scroll Logic
-const horizontalSection = document.getElementById("work");
+// --- 5. HORIZONTAL SCROLL (Desktop Only) ---
 let mm = gsap.matchMedia();
-
-mm.add("(min-width: 768px)", () => {
-  // Desktop Only: Horizontal Scroll
+mm.add("(min-width: 769px)", () => {
+  const horizontalSection = document.getElementById("work");
+  const horizontalScroll = document.getElementById("horizontal-scroll");
   const panels = gsap.utils.toArray(".panel");
-  gsap.to(panels, {
+
+  const scrollTween = gsap.to(panels, {
     xPercent: -100 * (panels.length - 1),
     ease: "none",
     scrollTrigger: {
       trigger: horizontalSection,
       pin: true,
       scrub: 1,
-      snap: 1 / (panels.length - 1),
-      end: () => "+=" + horizontalSection.offsetWidth * 2,
+      snap: {
+        snapTo: 1 / (panels.length - 1),
+        duration: 0.1,
+        delay: 0.1,
+      },
+      end: () => "+=" + horizontalScroll.offsetWidth,
+      invalidateOnRefresh: true, // Vital for responsiveness
     },
   });
+
+  return () => {
+    scrollTween.kill();
+  };
 });
 
-gsap.to(".hero-line", {
-  yPercent: -50,
-  ease: "none",
-  scrollTrigger: {
-    trigger: "#hero",
-    start: "top top",
-    end: "bottom top",
-    scrub: true,
-  },
-});
-
-// --- 6. COLOR THEME SWITCHER (Light/Dark) ---
-ScrollTrigger.create({
+// --- 6. THEME ADAPTATION ---
+// Unified theme switcher for better synchronization
+const themeTrigger = ScrollTrigger.create({
   trigger: "#contact",
-  start: "top 85%",
-  end: "bottom top",
-  onEnter: () => {
-    gsap.to("nav", {
-      backgroundColor: "rgba(0, 0, 0, 0.05)",
-      borderColor: "rgba(0, 0, 0, 0.1)",
-      duration: 0.3,
+  start: "top 50%",
+  onToggle: (self) => {
+    const isDark = !self.isActive;
+    gsap.to("body", {
+      backgroundColor: isDark ? "#0a0a0a" : "#fdfbf7",
+      duration: 0.6,
     });
-    gsap.to(".nav-item", { color: "#0a0a0a", duration: 0.3 });
-  },
-  onLeaveBack: () => {
-    gsap.to("nav", {
-      backgroundColor: "rgba(255, 255, 255, 0.05)",
-      borderColor: "rgba(255, 255, 255, 0.1)",
-      duration: 0.3,
+    gsap.to("#floating-nav", {
+      backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+      borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+      duration: 0.6,
     });
-    gsap.to(".nav-item", { color: "#ffffff", duration: 0.3 });
+    gsap.to(".nav-item", {
+      color: isDark ? "#ffffff" : "#0a0a0a",
+      duration: 0.6,
+    });
+    gsap.to(".header-text, .header-sub, #clock", {
+      color: isDark ? "#ffffff" : "#0a0a0a",
+      duration: 0.6,
+    });
+
+    // Sync cursor color with theme
+    if (cursorOuter && cursorInner) {
+      gsap.to(cursorOuter, {
+        borderColor: isDark ? "#ffffff" : "#0a0a0a",
+        duration: 0.6,
+      });
+      gsap.to(cursorInner, {
+        backgroundColor: isDark ? "#ffffff" : "#0a0a0a",
+        duration: 0.6,
+      });
+    }
   },
 });
 
-ScrollTrigger.create({
-  trigger: "#contact",
-  start: "top 10%",
-  end: "bottom top",
-  onEnter: () => {
-    gsap.to("header .font-serif", { color: "#0a0a0a", duration: 0.3 });
-    gsap.to("header .uppercase", { color: "#4b5563", duration: 0.3 });
-    gsap.to("#clock", { color: "#0a0a0a", duration: 0.3 });
-    gsap.to(".cursor-outer", { borderColor: "#0a0a0a", duration: 0.3 });
-    gsap.to(".cursor-inner", { backgroundColor: "#0a0a0a", duration: 0.3 });
-  },
-  onLeaveBack: () => {
-    gsap.to("header .font-serif", { color: "#ffffff", duration: 0.3 });
-    gsap.to("header .uppercase", { color: "#9ca3af", duration: 0.3 });
-    gsap.to("#clock", { color: "#ffffff", duration: 0.3 });
-    gsap.to(".cursor-outer", { borderColor: "#ffffff", duration: 0.3 });
-    gsap.to(".cursor-inner", { backgroundColor: "#ffffff", duration: 0.3 });
-  },
-});
-
-// --- 7. PROJECT MODAL LOGIC ---
-const projects = [
+// --- 7. PROJECT MODAL CONTROLLER ---
+const projectData = [
   {
-    id: 0,
     title: "Fretboard Memorizer",
-    category: "Music Theory tool",
+    category: "Educational Tool",
+    desc: "A gamified web application for guitarists to master note identification across the fretboard using the Web Speech API and custom intervals.",
+    img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200",
     year: "2024",
-    description:
-      "The Fretboard Memorizer is a web-based educational application designed to help guitarists and bassists master the fretboard. By gamifying the process of note identification, the tool addresses a common pain point for musicians: bridging the gap between musical theory and physical instrument proficiency.",
-    image: "./image/freatboard.png",
   },
   {
-    id: 1,
-    title: "AI-Powered Cyberbullying Detection System",
-    category: "CyberCrime",
+    title: "AI Cyberbullying Detection",
+    category: "NLP • Machine Learning",
+    desc: "An end-to-end ML application that detects and flags offensive communication in real-time using Scikit-learn, TF-IDF, and a Flask-based API.",
+    img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200",
     year: "2025",
-    description:
-      "This project is an end-to-end machine learning application designed to automatically detect and flag suspicious or bullying communication on social platforms. By integrating a Natural Language Processing (NLP) pipeline with a responsive web interface, the system provides real-time sentiment analysis to foster safer online environments.",
-    image: "./image/cyberbullying.png",
+  },
+  {
+    title: "AI Music Therapy System",
+    category: "AI • Audio Processing",
+    desc: "Engineered a research-driven AI system that provides personalized music therapy. The core model dynamically analyzes and adapts to user emotions in real-time, delivering a highly responsive and customized therapeutic audio experience.",
+    img: "ai_music_therapy.png",
+    year: "2026",
   },
 ];
 
 const modal = document.getElementById("project-modal");
 const modalContent = document.getElementById("modal-content");
-const modalImg = document.getElementById("modal-img");
-const modalTitle = document.getElementById("modal-title");
-const modalDesc = document.getElementById("modal-desc");
-const modalCategory = document.getElementById("modal-category");
-const modalYear = document.getElementById("modal-year");
 
 window.openProject = (index) => {
-  const p = projects[index];
-  if (!p) return;
+  const p = projectData[index];
+  if (!p || !modal || !modalContent) return;
 
-  // Populate data
-  modalTitle.innerText = p.title;
-  modalDesc.innerText = p.description;
-  modalCategory.innerText = p.category;
-  modalYear.innerText = p.year;
-  modalImg.src = p.image;
+  // Population
+  document.getElementById("modal-title").innerText = p.title;
+  document.getElementById("modal-category").innerText = p.category;
+  document.getElementById("modal-desc").innerText = p.desc;
+  document.getElementById("modal-img").src = p.img;
+  document.getElementById("modal-year").innerText = "Year: " + p.year;
 
-  // Show Modal Container
-  modal.style.pointerEvents = "auto";
-  document.body.style.overflow = "hidden"; // Prevent background scrolling
+  modal.classList.remove("pointer-events-none");
 
-  // Animation
-  gsap.to(modal, { opacity: 1, duration: 0.4 });
-  gsap.fromTo(
-    modalContent,
-    { y: 100, opacity: 0 },
-    { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.1 }
-  );
-  gsap.fromTo(
-    modalImg,
-    { scale: 1.2 },
-    { scale: 1, duration: 1.2, ease: "power2.out" }
-  );
+  const modalTl = gsap.timeline();
+  modalTl
+    .to(modal, { opacity: 1, duration: 0.4 })
+    .fromTo(
+      modalContent,
+      { y: 80, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: "power4.out" },
+      "-=0.2",
+    );
+
+  document.body.style.overflow = "hidden";
 };
 
 window.closeProject = () => {
-  gsap.to(modalContent, {
-    y: 100,
-    opacity: 0,
-    duration: 0.4,
-    ease: "power3.in",
-  });
-  gsap.to(modal, {
-    opacity: 0,
-    duration: 0.4,
-    delay: 0.1,
+  if (!modal || !modalContent) return;
+
+  const modalTl = gsap.timeline({
     onComplete: () => {
-      modal.style.pointerEvents = "none";
-      document.body.style.overflow = ""; // Restore background scrolling
+      modal.classList.add("pointer-events-none");
+      document.body.style.overflow = "";
     },
   });
+
+  modalTl
+    .to(modalContent, {
+      y: 40,
+      opacity: 0,
+      scale: 0.98,
+      duration: 0.4,
+      ease: "power2.in",
+    })
+    .to(modal, { opacity: 0, duration: 0.3 }, "-=0.2");
 };
+
+// Keyboard Accessibility
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !modal.classList.contains("pointer-events-none")) {
+    closeProject();
+  }
+});
+
+// Refresh ScrollTrigger on resize to ensure calculations remain "perfect"
+window.addEventListener("resize", () => {
+  ScrollTrigger.refresh();
+});
