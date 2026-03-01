@@ -83,10 +83,7 @@
 
     <!-- Spline Background -->
     <div class="spline-wrapper opacity-0" id="spline-bg">
-      <iframe
-        src="https://my.spline.design/animatedpaperboat-5V0hd9xLxuI9sJcGAjxOXyHS/?ui=false&watermark=false"
-        frameborder="0"
-      ></iframe>
+      <canvas id="canvas3d"></canvas>
     </div>
 
     <!-- Header -->
@@ -362,7 +359,7 @@
               class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
             >
               <img
-                src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200"
+                src="image/fretboard.png"
                 alt="Fretboard"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
               />
@@ -395,7 +392,7 @@
               class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
             >
               <img
-                src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200"
+                src="image/cyberbullying.png"
                 alt="Cyberbullying"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
               />
@@ -428,7 +425,7 @@
               class="project-card relative w-full max-w-3xl md:w-[45vw] h-[60vh] md:h-[65vh] overflow-hidden bg-zinc-900 shadow-2xl"
             >
               <img
-                src="ai_music_therapy.png"
+                src="image/ai_music_therapy.png"
                 alt="Music Therapy"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-60"
               />
@@ -492,12 +489,12 @@
               </h4>
               <ul class="space-y-2 text-sm text-gray-600">
                 <li>
-                  <a href="https://www.linkedin.com/in/mayank-patoliya-875712376" class="hover:text-black transition-colors"
+                  <a href="#" class="hover:text-black transition-colors"
                     >LinkedIn</a
                   >
                 </li>
                 <li>
-                  <a href="https://github.com/MayankPatoliya?tab=overview&from=2026-01-01&to=2026-01-31" class="hover:text-black transition-colors"
+                  <a href="#" class="hover:text-black transition-colors"
                     >GitHub</a
                   >
                 </li>
@@ -608,8 +605,27 @@
       </div>
     </div>
 
+    <!-- Global Styles -->
+    <style>
+      html,
+      body {
+        overflow-x: hidden;
+      }
+      .spline-watermark {
+        display: none !important;
+      }
+    </style>
+
     <!-- Link to external JS -->
     <script src="script.js" defer></script>
+
+    <!-- Spline 3D Background -->
+    <script type="module">
+      import { Application } from "https://unpkg.com/@splinetool/runtime";
+
+      const canvas = document.getElementById("canvas3d");
+      const app = new Application(canvas);
+      app.load("https://prod.spline.design/qLWrotjWu8lbuFhi/scene.splinecode");
+    </script>
   </body>
 </html>
-

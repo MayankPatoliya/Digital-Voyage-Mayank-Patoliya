@@ -1,3 +1,8 @@
+/**
+ * Digital Voyage Portfolio - Core Logic
+ * High-performance animations, fluid cursor tracking, and refined UI transitions.
+ */
+
 gsap.registerPlugin(ScrollTrigger);
 
 // --- 1. CLOCK UTILITY ---
@@ -214,21 +219,21 @@ const projectData = [
     title: "Fretboard Memorizer",
     category: "Educational Tool",
     desc: "A gamified web application for guitarists to master note identification across the fretboard using the Web Speech API and custom intervals.",
-    img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200",
+    img: "image/fretboard.png",
     year: "2024",
   },
   {
     title: "AI Cyberbullying Detection",
     category: "NLP • Machine Learning",
     desc: "An end-to-end ML application that detects and flags offensive communication in real-time using Scikit-learn, TF-IDF, and a Flask-based API.",
-    img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200",
+    img: "image/cyberbullying.png",
     year: "2025",
   },
   {
     title: "AI Music Therapy System",
     category: "AI • Audio Processing",
     desc: "Engineered a research-driven AI system that provides personalized music therapy. The core model dynamically analyzes and adapts to user emotions in real-time, delivering a highly responsive and customized therapeutic audio experience.",
-    img: "ai_music_therapy.png",
+    img: "image/ai_music_therapy.png",
     year: "2026",
   },
 ];
